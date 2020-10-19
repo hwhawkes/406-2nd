@@ -1,30 +1,47 @@
-var createError = require('http-errors');
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+var http = require('http');
+//var favicon = require('serve-favicon');
 var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var passport = require('passport');
+var socketIO = require('socket.io');
+require('./app_api/models/db');
+require('./app_api/config/passport'); 
 
-var indexRouter = require('./routes/index');
-/*var usersRouter = require('./routes/users');*/
 
+//var routesIndex  = require('./app_server/routes/index');
+var routesApi = require('./app_api/routes/index');
 var app = express();
+var server = http.Server(app);
+var io = socketIO(server);
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+//app.set('views', path.join(__dirname,'app_server', 'views'));
+
+
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public/')));
+app.use(express.static(path.join(__dirname, 'app_client')));
+app.use(passport.initialize());
 
-app.use('/', indexRouter);
-/*app.use('/users', usersRouter);*/
+//app.use('/', routesIndex);
+app.use('/api', routesApi);
+
+
+//app.use('/users', users);
+//app.use('/blogList', blogList);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handler

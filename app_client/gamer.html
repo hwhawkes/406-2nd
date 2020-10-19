@@ -1,0 +1,48 @@
+<!doctype html>
+<html ng-app="rueApp">
+
+
+<head>
+  <title>Harrison Hawkes</title>
+<!--    <style>
+          canvas {
+            width: 800px;
+            height: 600px;
+            border:  5px solid black;
+          }
+        </style>-->
+  <link rel='stylesheet' href='/public/stylesheets/style.css' />
+  <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular-route.min.js"></script>
+</head>
+
+<body>
+
+
+  <div ng-controller="NavigationController">
+    <navigation></navigation>
+  </div>
+
+
+
+<script type="text/ng-template" id="pages/rueprect.html">
+
+        <br>
+        <h1>Rueprect</h1>
+        <br>
+
+</script>
+
+
+  <div ng-view></div>
+  <script src="bloggerApp.js"></script>
+
+  <script src="common/auth/authenticationService.js"></script>
+  <script src="common/nav/navigationDirective.js"></script>
+
+</body>
+
+</html>
+
