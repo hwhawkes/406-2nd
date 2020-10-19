@@ -1,0 +1,295 @@
+<!doctype html>
+<html ng-app="bloggerApp">
+
+
+<head>
+  <title>Harrison Hawkes</title>
+<!--	<style>
+          canvas {
+            width: 800px;
+            height: 600px;
+            border:  5px solid black;
+          }
+        </style>-->
+  <link rel='stylesheet' href='/public/stylesheets/style.css' />
+  <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular-route.min.js"></script>
+</head>
+
+<body>
+
+ 
+  <div ng-controller="NavigationController">
+    <navigation></navigation>
+  </div>
+
+ 
+
+  <script type="text/ng-template" id="pages/home.html">
+      <div>
+	<p></p>
+	<br>    
+           <h4>{{vm.message}}</h4>
+
+	<br>
+	<p>Welcome to my section of the internet.</p>
+
+	<br>
+	<h2>About Me:</h2>
+	<p>I'm a computer science student close to graduation, currently looking for work and making projects in his spare time.  If you want to contact me for any reason, you can reach me at HarrisonWHawkes@gmail.com.  </p>
+
+
+      </div>
+  </script>
+
+ 
+  <script type="text/ng-template" id="pages/blogList.html">
+    <br>
+    <div ng-repeat = "blog in vm.blogs">
+        <div class = "card border-primary" style = "width: 75%">
+          <div class = "card-header" >
+          </div>    
+          <div class = "card-body">
+            <h5 class = "card-title">{{blog.blogTitle}}</h5>
+            <p class = "card-text">
+              {{blog.blogText}}
+              <br>
+              <small class="font-italic" >Published by {{blog.blogAuthor}} on {{blog.dateOfCreationFormated}}</small>
+            </p>
+          </div>
+          <div  class="card-footer" class="col-sm" >
+              <div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width:{{blog.blogFav}}%; background: #7cb0ff" aria-valuenow="{{blog.blogFav}}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <ul class="nav justify-content-end nav-pills card-header-pills">
+                  <div class="nav justify-content-end nav-pills card-header-pills">
+                    <li class="nav-item"  ng-show="vm.isLoggedIn() && blog.blogEmail == vm.userEmail" >
+                      <a class="nav-link" href = "#/blogEdit/{{blog._id}}"> <i class="fas fa-edit"></i></a>
+                    </li>
+                    <li class="nav-item"  ng-show="vm.isLoggedIn() && blog.blogEmail == vm.userEmail" >
+                      <a class="nav-link" href = "#/blogDelete/{{blog._id}}"> <i class="fas fa-trash-alt"></i></a>
+                    </li>
+                    <div class="btn-group btn-group-toggle" ng-show="blog.blogEmail != vm.userEmail" data-toggle="buttons" style="margin-left: 20px; margin-right:18px;margin-top:12px">
+                        <label class="btn btn-primary" >
+                          <input type="radio" name="options" id="option1" autocomplete="off" ng-click="vm.incrementFavorite(blog._id, 'fav')"> Favorite {{blog.blogFav}}
+                        </label>
+                    </div>
+                  </div>
+                </ul>
+              </div>  
+           </div>
+        </div>
+        <br>
+      </div>
+    </script>
+ 
+  <script type="text/ng-template" id="pages/blogAdd.html">
+   <br>
+    <div class = "card border-primary" style = "width: 75%">
+        <div class = "card-header"></div>
+          <div class = "card-body">      
+	    <form name = "addForm" ng-submit = "vm.submit()" ng-controller = "AddController" style = "padding: 20px">
+          <div class="form-group">
+              <label for="blogTitle">Blog Title</label>
+              <input type = "text" class = "form-control" name = "blogTitle" id = "blogTitle" required>
+          </div>
+          <div class = "form-group">
+              <label for = "blogText">Blog Text</label>
+              <textarea type = "text" class = "form-control" name = "blogText" id = "blogText"></textarea>
+          </div>
+          <button type = "submit" class = "btn btn-primary">Add Blog</button>
+	    </form>
+    </div>
+    <div  class="card-footer"></div>
+  </div>
+  </script>
+
+
+  <script type="text/ng-template" id="pages/blogEdit.html">
+    <p></p>
+    <div class = "card border-primary" style="width: 75%">
+      <div class = "card-header"></div>
+	        <form name = "editForm" class = "card-body" ng-submit = "vm.submit()" ng-controller = "EditController" style = "padding: 20px">
+	         <div class = "form-group">
+	            <label for = "blogTitle" class = "text-primary">Blog Title</label>
+	            <input class = "form-control" id = "blogTitle" name = "blogTitle" value = "{{vm.blog.blogTitle}}">
+	            <label for = "blogText" class = "text-primary">Blog Text</label>
+	            <textarea class = "form-control" id = "blogText" name  = "blogText" rows = "3">{{vm.blog.blogText}}</textarea>
+	         </div>
+	            <input type = "submit" class = "btn btn-primary" value = "Save ">
+	         </form>
+       <div  class="card-footer"></div>
+     </div>
+  </script>
+  
+  <script type="text/ng-template" id="pages/blogDelete.html">
+      <br>
+      <div class = "card border-primary" style = "width: 75%">
+        <div class = "card-header"></div>
+	      <form class = "card-body" name = "deleteForm" ng-submit = "vm.submit()" ng-controller = "DeleteController" style = "padding: 20px">
+            <div class="form-group">
+              <label for="blogTitle" class = "text-primary">Blog Title</label>
+              <input readonly = "" type = "text" class = "form-control" name = "blogTitle" id = "blogTitle" value = {{vm.blog.blogTitle}} required="">
+            </div>
+            <div class = "form-group">
+              <label for = "blogText" class = "text-primary">Blog Text</label>
+              <textarea readonly = "" type = "text" class = "form-control" name = "blogText" id = "blogText">{{vm.blog.blogText}}
+              </textarea>
+            </div>
+            <a role = "button"  href="#/blogList">Cancel</a>
+            <input role = "button" type = "submit" value = "Delete"></button>
+        </form>
+        <div  class="card-footer"></div>
+      </div>
+    </script>
+
+  
+  <script type="text/ng-template" id="pages/register.html">
+      <br>
+      <div class="container">
+        <page-header content="vm.pageHeader"></page-header>
+        <div class="row">
+          <div class="col-md-6 col-sm-12">
+            <p class="lead">{{ vm.testStirng}}Already a member? Please <a href="/#login?page={{ vm.returnPage }}">log in</a> instead.</p>
+            <form ng-submit="vm.onSubmit()">
+              <div role="alert" ng-show="vm.formError" class="alert alert-danger">{{ vm.formError }}</div>
+              <div class="form-group">
+                <label for="name">Full name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter your name" ng-model="vm.credentials.name">
+              </div>
+              <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter email" ng-model="vm.credentials.email">
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password" ng-model="vm.credentials.password">
+              </div>
+              <button type="submit" class="btn btn-default">Register!</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </script>
+
+ 
+  <script type="text/ng-template" id="pages/login.html">
+  <br>
+  <div class="container">
+    <page-header content="vm.pageHeader"></page-header>
+  
+    <div class="row">
+      <div class="col-md-6 col-sm-8">
+        <p class="lead">Not a member? Please <a href="/#register?page={{ vm.returnPage }}">register</a> first.</p>
+        <form ng-submit="vm.onSubmit()">
+          <div role="alert" ng-show="vm.formError" class="alert alert-danger">{{ vm.formError }}</div>
+          <div class = "form-group">
+            <label for = "email">Email address</label>
+            <input type="email" class = "form-control" id = "email" placeholder = "Enter email" ng-model = "vm.credentials.email">
+          </div>
+          <div class = "form-group">
+            <label for = "password">Password</label>
+            <input type = "password" class = "form-control" id = "password" placeholder = "Password" ng-model = "vm.credentials.password">
+          </div>
+          <button type = "submit">Sign in!</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+ <script type="text/ng-template" id="pages/projects.html">
+
+<p></p>
+       <h1>Projects</h1>
+       <p width = "75%">These are completed projects that I have worked on.  Incomplete projects can be found at the bottom.  Partners I worked with are given credit accordingly.</p>
+        <br>
+
+        <h2>JavaScript and CSS work</h2>
+        <p width = "75%"> These are some small examples of things I have done with Javascript and/ or CSS. </p>
+	<ul>
+	  <li>Here is a website I made with css (LINK)</li>
+	  <li>Here is some work I've done with javascript</li>
+	  <li>Here is some work I've done with SQL</li>
+
+	</ul
+
+
+        <h2>UML Diagram Creator</h2>
+        <p  width = "75%">This is a java program utilizing JavaFX in order to create basic UML diagrams.
+        This was made from a group, the people that I worked with can be found <a href = "https://github.com/JavvaTheHuttt"> here</a>.  The download for the program
+        can be found <a href = "https://github.com/JavvaTheHuttt/UMLEditor"> here </a>.</p>
+        <p  width = "75%">Program in use:</p>
+
+	<br>
+	<img src="/public/images/UMLDiagram.PNG" width = "50%">
+	<br><br><br>
+
+        <h2>This Website!</h2>
+        <p width = "75%">This website was made for school.  It seamlessly transports you from page to page.  It uses the MEAN stack which is a platform whose main parts consist of: MongoDB, Express, AngularJS, and NodeJS. </p>
+
+</script>
+
+ <script type="text/ng-template" id="pages/resume.html">
+
+	<br>
+	<h1>Resume</h1>
+	<br>
+	<p>I am currently looking for employment in multiple places, my listed address may not be not near your area.  Rest assured that if I applied to your job, that I am able to relocate to the area within a quick time frame, and I will also be available for interviews.</p>
+	<br><br>
+	<p style="background-color: #4286f4; text-align: center; color: white; font: 20pt">
+	<a class="nav-item nav-link active" style="color: white;" href="/public/PDFs/Harry-Hawkes.pdf">Resume</a>
+	</p>
+	<br>
+
+</script>
+
+
+<script type="text/ng-template" id="pages/boxgame.html">
+
+	<br>
+	<h1> BOX GAME </h1>
+	<br>
+	
+
+
+</script>
+
+
+<script type="text/ng-template" id="pages/rate.html">
+	
+	<br>
+	<h1> RATINGS </h1>
+	<br>
+	<p>I would love to get your opinion on my website</p>
+	<br>
+
+	<form ng-submit="vm.onSubmit()">
+	 <label for = "name">Name(Optional)</label>
+	 <input type = "name" class = "form-control" id = "name" placeholder = "name" >
+	 
+	 <label for = "genRating">Overall Website Rating</label>
+	 <input type = "genRating" class = "form-control" id = "genRating">
+
+	 <button type = "submit">Submit</button>
+	</form>
+
+	<br><br>
+        
+
+
+</script>
+
+  <div ng-view></div>
+  <script src="bloggerApp.js"></script>
+ 
+  <script src="common/auth/authenticationService.js"></script>
+  <script src="common/nav/navigationDirective.js"></script>
+
+</body>
+
+</html>
